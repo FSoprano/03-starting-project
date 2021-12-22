@@ -11,5 +11,4 @@ const Movie = (props) => {
     </li>
   );
 };
-
 export default Movie;
