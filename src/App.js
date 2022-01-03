@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import MoviesList from './components/MoviesList';
 import './App.css';
+
 
 function App() {
   // const dummyMovies = [
@@ -22,13 +23,18 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchMoviesHandler = async () => {
+  // useEffect seems to be the hook for the old lifecycle methods. It should 
+  // load the movies list when the page renders, without clicking the button.
+  // The array (second argument) defines dependencies. When the dependencies are met
+  // the function runs again, so with an empty array it never runs again.
+  
+  const fetchMoviesHandler = useCallback(async () => {
     try {
     setIsLoading(true);
     // a second fetch argument is possible, in which one can specify a specific method
     // to be used. However, the default method is GET, and we want to use 
     // GET, so no extra argument is needed here. // fetch gives us a promise. Hence:
-    const response = await fetch('https://swapi.dev/api/film');
+    const response = await fetch('https://swapi.dev/api/films');
       // The API delivers JSON data . The json() method (build-in) converts 
       // the JSON to a Javascript object without string delimiters around the 
       // keys.
@@ -64,7 +70,20 @@ function App() {
     // We want to set isLoading to false no matter what happened before.
     // Hence we call it here, in this place.
       setIsLoading(false);
-  };
+  }, []);
+  // Empty array is dependencies list of useCallback() function.
+
+  useEffect(() => {
+    fetchMoviesHandler();
+  }, [fetchMoviesHandler]);
+  
+  // Added a pointer to fetchMoviesHandler as a dependencies because 
+  // we might want to run the function again when it changes (fetchMovieshandler).
+  // However, this will make it always run again when the state changes. 
+  // So we create an infinite loop.
+  // To avoid that, we use the callback hook. useCallback()
+  
+
   return (
     <React.Fragment>
       <section>
